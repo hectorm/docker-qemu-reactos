@@ -1,0 +1,9 @@
+#!/bin/sh
+
+set -eu
+
+# Create ReactOS disk
+qemu-img create -f "${QEMU_DISK_FORMAT}" /var/lib/qemu/images/reactos.img "${QEMU_DISK_SIZE}"
+
+# Start all services
+exec runsvdir -P /etc/service/

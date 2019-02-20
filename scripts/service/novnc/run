@@ -1,0 +1,7 @@
+#!/bin/sh
+
+set -eu
+
+cd ~/
+exec 2>&1
+exec /usr/share/novnc/utils/launch.sh --listen 6080 --vnc localhost:5900
