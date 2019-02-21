@@ -36,7 +36,7 @@ docker run --detach \
 	--log-opt max-size=32m \
 	--publish '127.0.0.1:5900:5900/tcp' \
 	--publish '127.0.0.1:6080:6080/tcp' \
-	--publish '127.0.0.1:15900:5900/tcp' \
+	--publish '127.0.0.1:15900:15900/tcp' \
 	--privileged --env QEMU_KVM=true \
 	"${DOCKER_IMAGE}" "$@" >/dev/null
 
