@@ -27,8 +27,8 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 RUN mkdir -p /var/lib/qemu/images/ /var/lib/qemu/iso/
 
 # Download ReactOS ISO
-ARG REACTOS_ISO_URL=https://github.com/reactos/reactos/releases/download/0.4.10-release/ReactOS-0.4.10-iso.zip
-ARG REACTOS_ISO_CHECKSUM=6e7b80a8d89adf1ed73a4733227d1ecf368bb237fafc322b9fb319a737dcd061
+ARG REACTOS_ISO_URL=https://downloads.sourceforge.net/project/reactos/ReactOS/0.4.11/ReactOS-0.4.11-iso.zip
+ARG REACTOS_ISO_CHECKSUM=68120b3481c99c6b0563d5f3ec469ab197f2c8abc38d29adba4c40d01acd92c8
 RUN mkdir /tmp/reactos/ \
 	&& curl -Lo /tmp/reactos/reactos.zip "${REACTOS_ISO_URL}" \
 	&& echo "${REACTOS_ISO_CHECKSUM}  /tmp/reactos/reactos.zip" | sha256sum -c \
