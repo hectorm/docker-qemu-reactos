@@ -6,6 +6,10 @@ ENV QEMU_RAM=1024M
 ENV QEMU_DISK_SIZE=16G
 ENV QEMU_DISK_FORMAT=qcow2
 ENV QEMU_KEYBOARD=en-us
+ENV QEMU_NET_DEVICE=rtl8139
+ENV QEMU_NET_OPTIONS=hostfwd=tcp::13389-:3389,hostfwd=tcp::15900-:5900
+ENV QEMU_BOOT_ORDER=cd
+ENV QEMU_BOOT_MENU=off
 ENV QEMU_KVM=false
 
 # Install system packages
@@ -42,7 +46,10 @@ COPY --chown=root:root scripts/service/ /etc/service/
 # Copy scripts
 COPY --chown=root:root scripts/bin/ /usr/local/bin/
 
-# Expose noVNC port
+# Expose ports
+## VNC
+EXPOSE 5900/tcp
+## noVNC
 EXPOSE 6080/tcp
 
 CMD ["/usr/local/bin/docker-foreground-cmd"]
