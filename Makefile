@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 
 SHELL := /bin/sh
-.SHELLFLAGS = -eu -c
+.SHELLFLAGS := -eu -c
 
 DOCKER := $(shell command -v docker 2>/dev/null)
 GIT := $(shell command -v git 2>/dev/null)
@@ -20,8 +20,9 @@ endif
 IMAGE_LATEST_TAG := $(IMAGE_NAMESPACE)/$(IMAGE_NAME):latest
 IMAGE_VERSION_TAG := $(IMAGE_NAMESPACE)/$(IMAGE_NAME):$(IMAGE_VERSION)
 
-IMAGE_DOCKERFILE := ./Dockerfile
 IMAGE_TARBALL := $(DISTDIR)/$(IMAGE_NAME).tgz
+
+DOCKERFILE := ./Dockerfile
 
 ##################################################
 ## "all" target
@@ -37,9 +38,9 @@ all: save-image
 .PHONY: build-image
 build-image:
 	'$(DOCKER)' build \
-		--tag '$(IMAGE_LATEST_TAG)' \
 		--tag '$(IMAGE_VERSION_TAG)' \
-		--file '$(IMAGE_DOCKERFILE)' ./
+		--tag '$(IMAGE_LATEST_TAG)' \
+		--file '$(DOCKERFILE)' ./
 
 ##################################################
 ## "save-*" targets
