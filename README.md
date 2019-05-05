@@ -11,7 +11,7 @@ docker run --detach \
   --privileged --env QEMU_KVM=true \
   hectormolinero/qemu-reactos:latest
 ```
-> The instance will be available through a web browser from: http://localhost:6080/vnc_auto.html
+> The instance will be available through a web browser from: http://localhost:6080/vnc.html
 
 ## Environment variables
 #### `QEMU_CPU`

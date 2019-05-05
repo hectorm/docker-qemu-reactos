@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM debian:sid
 
 # Environment
 ENV QEMU_CPU=2
@@ -20,6 +20,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 		curl \
 		net-tools \
 		novnc \
+		procps \
 		qemu-kvm \
 		qemu-system-x86 \
 		qemu-utils \
