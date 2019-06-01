@@ -1,4 +1,4 @@
-FROM debian:sid
+FROM docker.io/debian:sid
 
 # Environment
 ENV QEMU_CPU=2

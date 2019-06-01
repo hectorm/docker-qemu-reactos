@@ -7,22 +7,20 @@ DOCKER := $(shell command -v docker 2>/dev/null)
 GIT := $(shell command -v git 2>/dev/null)
 
 DISTDIR := ./dist
+VERSION_FILE = ./VERSION
+DOCKERFILE := ./Dockerfile
 
+IMAGE_REGISTRY := docker.io
 IMAGE_NAMESPACE := hectormolinero
-IMAGE_NAME := qemu-reactos
-IMAGE_VERSION := v0
+IMAGE_PROJECT := qemu-reactos
+IMAGE_NAME := $(IMAGE_REGISTRY)/$(IMAGE_NAMESPACE)/$(IMAGE_PROJECT)
 
-# If git is available and the directory is a repository, use the latest tag as IMAGE_VERSION.
-ifeq ([$(notdir $(GIT))][$(wildcard .git/.)],[git][.git/.])
-	IMAGE_VERSION := $(shell '$(GIT)' describe --abbrev=0 --tags 2>/dev/null || printf '%s' '$(IMAGE_VERSION)')
+IMAGE_VERSION := v0
+ifneq ($(wildcard $(VERSION_FILE)),)
+	IMAGE_VERSION := $(shell cat '$(VERSION_FILE)')
 endif
 
-IMAGE_LATEST_TAG := $(IMAGE_NAMESPACE)/$(IMAGE_NAME):latest
-IMAGE_VERSION_TAG := $(IMAGE_NAMESPACE)/$(IMAGE_NAME):$(IMAGE_VERSION)
-
-IMAGE_TARBALL := $(DISTDIR)/$(IMAGE_NAME).tgz
-
-DOCKERFILE := ./Dockerfile
+IMAGE_TARBALL := $(DISTDIR)/$(IMAGE_PROJECT).txz
 
 ##################################################
 ## "all" target
@@ -38,8 +36,8 @@ all: save-image
 .PHONY: build-image
 build-image:
 	'$(DOCKER)' build \
-		--tag '$(IMAGE_VERSION_TAG)' \
-		--tag '$(IMAGE_LATEST_TAG)' \
+		--tag '$(IMAGE_NAME):$(IMAGE_VERSION)' \
+		--tag '$(IMAGE_NAME):latest' \
 		--file '$(DOCKERFILE)' ./
 
 ##################################################
@@ -47,7 +45,7 @@ build-image:
 ##################################################
 
 define save_image
-	'$(DOCKER)' save '$(1)' | gzip -n > '$(2)'
+	'$(DOCKER)' save '$(1)' | xz -T0 > '$(2)'
 endef
 
 .PHONY: save-image
@@ -55,7 +53,7 @@ save-image: $(IMAGE_TARBALL)
 
 $(IMAGE_TARBALL): build-image
 	mkdir -p '$(DISTDIR)'
-	$(call save_image,$(IMAGE_VERSION_TAG),$@)
+	$(call save_image,$(IMAGE_NAME):$(IMAGE_VERSION),$@)
 
 ##################################################
 ## "load-*" targets
@@ -72,7 +70,7 @@ endef
 .PHONY: load-image
 load-image:
 	$(call load_image,$(IMAGE_TARBALL))
-	$(call tag_image,$(IMAGE_VERSION_TAG),$(IMAGE_LATEST_TAG))
+	$(call tag_image,$(IMAGE_NAME):$(IMAGE_VERSION),$(IMAGE_NAME):latest)
 
 ##################################################
 ## "push-*" targets
@@ -84,8 +82,8 @@ endef
 
 .PHONY: push-image
 push-image:
-	$(call push_image,$(IMAGE_VERSION_TAG))
-	$(call push_image,$(IMAGE_LATEST_TAG))
+	$(call push_image,$(IMAGE_NAME):$(IMAGE_VERSION))
+	$(call push_image,$(IMAGE_NAME):latest)
 
 ##################################################
 ## "version" target
