@@ -14,7 +14,7 @@ containerExists() { docker ps -aqf name="$1" --format '{{.Names}}' | grep -Fxq "
 containerIsRunning() { docker ps -qf name="$1" --format '{{.Names}}' | grep -Fxq "$1"; }
 
 if ! imageExists "${IMAGE_NAME}"; then
-	>&2 printf -- '%s\n' "${IMAGE_NAME} image doesn't exist!"
+	>&2 printf -- '%s\n' "\"${IMAGE_NAME}\" image doesn't exist!"
 	exit 1
 fi
 
