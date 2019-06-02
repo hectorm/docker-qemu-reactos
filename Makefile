@@ -108,4 +108,4 @@ version:
 .PHONY: clean
 clean:
 	rm -f '$(IMAGE_TARBALL)'
-	if [ -d '$(DISTDIR)' ]; then rmdir '$(DISTDIR)'; fi
+	if [ -d '$(DISTDIR)' ] && [ -z "$$(ls -A '$(DISTDIR)')" ]; then rmdir '$(DISTDIR)'; fi
