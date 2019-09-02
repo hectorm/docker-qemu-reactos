@@ -35,8 +35,8 @@ RUN mkdir -p /var/lib/qemu/images/ /var/lib/qemu/iso/
 ARG REACTOS_ISO_URL=https://downloads.sourceforge.net/project/reactos/ReactOS/0.4.11/ReactOS-0.4.11-iso.zip
 ARG REACTOS_ISO_CHECKSUM=68120b3481c99c6b0563d5f3ec469ab197f2c8abc38d29adba4c40d01acd92c8
 RUN mkdir /tmp/reactos/ \
-	&& curl -Lo /tmp/reactos/reactos.zip "${REACTOS_ISO_URL}" \
-	&& echo "${REACTOS_ISO_CHECKSUM}  /tmp/reactos/reactos.zip" | sha256sum -c \
+	&& curl -Lo /tmp/reactos/reactos.zip "${REACTOS_ISO_URL:?}" \
+	&& echo "${REACTOS_ISO_CHECKSUM:?}  /tmp/reactos/reactos.zip" | sha256sum -c \
 	&& unzip /tmp/reactos/reactos.zip -d /tmp/reactos/ \
 	&& mv /tmp/reactos/*.iso /var/lib/qemu/iso/reactos.iso \
 	&& rm -rf /tmp/reactos/
@@ -53,4 +53,4 @@ EXPOSE 5900/tcp
 ## noVNC
 EXPOSE 6080/tcp
 
-CMD ["/usr/local/bin/docker-foreground-cmd"]
+CMD ["/usr/local/bin/container-foreground-cmd"]
