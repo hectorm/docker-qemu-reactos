@@ -13,6 +13,6 @@ QEMU_ARGS="${QEMU_ARGS-} -usb -device usb-tablet"
 QEMU_ARGS="${QEMU_ARGS-} -k ${QEMU_KEYBOARD:?}"
 if [ "${QEMU_KVM:?}" = true ]; then QEMU_ARGS="${QEMU_ARGS-} -enable-kvm"; fi
 
-cd ~/
+cd /var/lib/qemu/
 exec 2>&1
 exec "${QEMU:?}" ${QEMU_ARGS:?}

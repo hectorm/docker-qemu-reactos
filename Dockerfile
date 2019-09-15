@@ -19,14 +19,27 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 		ca-certificates \
 		curl \
 		net-tools \
-		novnc \
 		procps \
+		python3 \
+		python3-numpy \
 		qemu-kvm \
 		qemu-system-x86 \
 		qemu-utils \
 		runit \
 		unzip \
 	&& rm -rf /var/lib/apt/lists/*
+
+# Install noVNC
+ARG NOVNC_VERSION=v1.1.0
+ARG NOVNC_TARBALL_URL=https://github.com/novnc/noVNC/archive/${NOVNC_VERSION}.tar.gz
+RUN mkdir /opt/novnc/
+RUN curl -sSfL "${NOVNC_TARBALL_URL:?}" | tar -xz --strip-components=1 -C /opt/novnc/
+
+# Install Websockify
+ARG WEBSOCKIFY_VERSION=v0.9.0
+ARG WEBSOCKIFY_TARBALL_URL=https://github.com/novnc/websockify/archive/${WEBSOCKIFY_VERSION}.tar.gz
+RUN mkdir -p /opt/novnc/utils/websockify/
+RUN curl -sSfL "${WEBSOCKIFY_TARBALL_URL:?}" | tar -xz --strip-components=1 -C /opt/novnc/utils/websockify/
 
 # Create data directories
 RUN mkdir -p /var/lib/qemu/images/ /var/lib/qemu/iso/

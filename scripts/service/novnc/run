@@ -2,6 +2,6 @@
 
 set -eu
 
-cd ~/
+cd /opt/novnc/utils/websockify/
 exec 2>&1
-exec /usr/share/novnc/utils/launch.sh --listen 6080 --vnc localhost:5900
+exec /usr/bin/python3 -m websockify --web /opt/novnc/ 6080 localhost:5900
