@@ -14,21 +14,21 @@ default:
     - name: "docker.io/docker:dind"
       alias: "dockerd"
 
-build:images:native:
+build:images:
   stage: "build:images"
   before_script:
     - "apk add --no-cache coreutils git make xz"
   script:
-    - "make build-native-image save-native-image"
+    - "make build-image save-image"
   artifacts:
     expire_in: "1 day"
     paths:
       - "./dist/"
 
-push:images:native:
+push:images:
   stage: "push:images"
   dependencies:
-    - "build:images:native"
+    - "build:images"
   only:
     - "/^v[0-9]+$/"
   before_script:
