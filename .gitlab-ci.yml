@@ -1,38 +1,38 @@
-image: "docker.io/docker:stable"
-
-services:
-  - "docker:dind"
-
 stages:
   - "build:images"
   - "push:images"
 
 variables:
-  DOCKER_HOST: "tcp://docker:2375"
+  DOCKER_HOST: "tcp://dockerd:2376"
+  DOCKER_TLS_SAN: "DNS:dockerd"
+  DOCKER_TLS_CERTDIR: "/certs"
   DOCKER_DRIVER: "overlay2"
 
-build:image:
+default:
+  image: "docker.io/docker:stable"
+  services:
+    - name: "docker.io/docker:dind"
+      alias: "dockerd"
+
+build:images:native:
   stage: "build:images"
   before_script:
-    - "docker info"
     - "apk add --no-cache coreutils git make xz"
   script:
-    - "make build-image save-image"
+    - "make build-native-image save-native-image"
   artifacts:
-    expire_in: "1 hour"
+    expire_in: "1 day"
     paths:
-      - "dist/"
+      - "./dist/"
 
-push:image:
+push:images:native:
   stage: "push:images"
+  dependencies:
+    - "build:images:native"
+  only:
+    - "/^v[0-9]+$/"
   before_script:
     - "apk add --no-cache coreutils git make xz"
-    - "docker login -u \"${CI_REGISTRY_USER:?}\" -p \"${CI_REGISTRY_PASSWORD:?}\" \"${CI_REGISTRY:?}\" >/dev/null 2>&1"
+    - "docker login -u \"${CI_REGISTRY_USER:?}\" -p \"${CI_REGISTRY_PASSWORD:?}\" \"${CI_REGISTRY:?}\""
   script:
     - "make load-image push-image"
-  only:
-    - "/^v([0-9.]+)(-.+)?$/"
-  except:
-    - "branches"
-  dependencies:
-    - "build:image"
