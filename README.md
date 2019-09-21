@@ -30,7 +30,7 @@ VM disk format (`qcow2` by default).
 VM keyboard layout (`en-us` by default).
 
 #### `QEMU_NET_DEVICE`
-VM network device (`rtl8139` by default).
+VM network device (`e1000` by default).
 
 #### `QEMU_BOOT_ORDER`
 VM boot order (`cd` by default).
