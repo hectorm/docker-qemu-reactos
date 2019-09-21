@@ -45,8 +45,8 @@ RUN curl -sSfL "${WEBSOCKIFY_TARBALL_URL:?}" | tar -xz --strip-components=1 -C /
 RUN mkdir -p /var/lib/qemu/images/ /var/lib/qemu/iso/
 
 # Download ReactOS ISO
-ARG REACTOS_ISO_URL=https://downloads.sourceforge.net/project/reactos/ReactOS/0.4.11/ReactOS-0.4.11-iso.zip
-ARG REACTOS_ISO_CHECKSUM=68120b3481c99c6b0563d5f3ec469ab197f2c8abc38d29adba4c40d01acd92c8
+ARG REACTOS_ISO_URL=https://downloads.sourceforge.net/project/reactos/ReactOS/0.4.12/ReactOS-0.4.12-iso.zip
+ARG REACTOS_ISO_CHECKSUM=16351c1352a05576e920fe3453a4a9e79bfd551b1dba696fbd16c61b60ce4c86
 RUN mkdir /tmp/reactos/ \
 	&& curl -Lo /tmp/reactos/reactos.zip "${REACTOS_ISO_URL:?}" \
 	&& echo "${REACTOS_ISO_CHECKSUM:?}  /tmp/reactos/reactos.zip" | sha256sum -c \
