@@ -1,4 +1,8 @@
-FROM docker.io/debian:sid
+##################################################
+## "qemu-reactos" stage
+##################################################
+
+FROM docker.io/debian:sid AS qemu-reactos
 
 # Environment
 ENV QEMU_CPU=2
