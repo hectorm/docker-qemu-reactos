@@ -54,8 +54,8 @@ RUN mkdir -p /opt/novnc/utils/websockify/ \
 	&& rm -f /tmp/websockify.tgz
 
 # Download ReactOS ISO
-ARG REACTOS_ISO_URL=https://downloads.sourceforge.net/project/reactos/ReactOS/0.4.12/ReactOS-0.4.12-iso.zip
-ARG REACTOS_ISO_CHECKSUM=16351c1352a05576e920fe3453a4a9e79bfd551b1dba696fbd16c61b60ce4c86
+ARG REACTOS_ISO_URL=https://downloads.sourceforge.net/project/reactos/ReactOS/0.4.13/ReactOS-0.4.13-iso.zip
+ARG REACTOS_ISO_CHECKSUM=5bd27a9f9af4589ca1683795775c747a96c5a45fcb570f543d5370f55c079ae6
 RUN mkdir -p /tmp/reactos/ /var/lib/qemu/iso/ /var/lib/qemu/images/ \
 	&& curl -Lo /tmp/reactos/reactos.zip "${REACTOS_ISO_URL:?}" \
 	&& printf '%s' "${REACTOS_ISO_CHECKSUM:?}  /tmp/reactos/reactos.zip" | sha256sum -c \
