@@ -20,6 +20,8 @@ ifneq ($(wildcard $(VERSION_FILE)),)
 	IMAGE_VERSION := $(shell cat '$(VERSION_FILE)')
 endif
 
+IMAGE_BUILD_OPTS :=
+
 IMAGE_TARBALL := $(DISTDIR)/$(IMAGE_PROJECT).txz
 
 ##################################################
@@ -35,7 +37,7 @@ all: save-image
 
 .PHONY: build-image
 build-image:
-	'$(DOCKER)' build \
+	'$(DOCKER)' build $(IMAGE_BUILD_OPTS) \
 		--tag '$(IMAGE_NAME):$(IMAGE_VERSION)' \
 		--tag '$(IMAGE_NAME):latest' \
 		--file '$(DOCKERFILE)' ./
