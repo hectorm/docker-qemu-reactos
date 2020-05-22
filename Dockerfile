@@ -64,10 +64,10 @@ RUN mkdir -p /tmp/reactos/ /var/lib/qemu/iso/ /var/lib/qemu/images/ \
 	&& rm -rf /tmp/reactos/
 
 # Copy services
-COPY --chown=root:root scripts/service/ /etc/service/
+COPY --chown=root:root ./scripts/service/ /etc/service/
 
 # Copy scripts
-COPY --chown=root:root scripts/bin/ /usr/local/bin/
+COPY --chown=root:root ./scripts/bin/ /usr/local/bin/
 
 # Expose ports
 ## VNC
