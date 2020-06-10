@@ -25,7 +25,6 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 		net-tools \
 		procps \
 		python3 \
-		python3-numpy \
 		qemu-kvm \
 		qemu-system-x86 \
 		qemu-utils \
