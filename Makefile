@@ -22,7 +22,7 @@ endif
 
 IMAGE_BUILD_OPTS :=
 
-IMAGE_TARBALL := $(DISTDIR)/$(IMAGE_PROJECT).txz
+IMAGE_TARBALL := $(DISTDIR)/$(IMAGE_PROJECT).tzst
 
 ##################################################
 ## "all" target
@@ -47,7 +47,7 @@ build-image:
 ##################################################
 
 define save_image
-	'$(DOCKER)' save '$(1)' | xz -T0 > '$(2)'
+	'$(DOCKER)' save '$(1)' | zstd -T0 -19 > '$(2)'
 endef
 
 .PHONY: save-image
@@ -62,7 +62,7 @@ $(IMAGE_TARBALL): build-image
 ##################################################
 
 define load_image
-	'$(DOCKER)' load -i '$(1)'
+	zstd -dc '$(1)' | '$(DOCKER)' load
 endef
 
 define tag_image
