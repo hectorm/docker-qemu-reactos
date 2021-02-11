@@ -9,7 +9,7 @@ docker run --detach \
   --restart on-failure:3 \
   --publish 127.0.0.1:6080:6080/tcp \
   --privileged --env QEMU_KVM=true \
-  hectormolinero/qemu-reactos:latest
+  docker.io/hectormolinero/qemu-reactos:latest
 ```
 > The instance will be available through a web browser from: http://localhost:6080/vnc.html
 
