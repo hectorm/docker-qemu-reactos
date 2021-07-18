@@ -30,8 +30,8 @@ RUN printf '%s' "${WEBSOCKIFY_TARBALL_CHECKSUM:?}  /tmp/websockify.tgz" | sha256
 RUN mkdir /tmp/websockify/ && tar -xzf /tmp/websockify.tgz --strip-components=1 -C /tmp/websockify/
 
 # Download ReactOS ISO
-ARG REACTOS_ISO_URL=https://downloads.sourceforge.net/project/reactos/ReactOS/0.4.14/ReactOS-0.4.14-RC-78-g591b517-iso.zip
-ARG REACTOS_ISO_CHECKSUM=827ed78b0034f89597de5e39a9aae29325b8a998cf4573b1a179526bcda3b79a
+ARG REACTOS_ISO_URL=https://downloads.sourceforge.net/project/reactos/ReactOS/0.4.14/ReactOS-0.4.14-RC-96-g08352ec-iso.zip
+ARG REACTOS_ISO_CHECKSUM=e8ab9c83a4024013d04c0249fc4865e00484d54a69d40967d16ead40c4e62323
 RUN curl -Lo /tmp/reactos.zip "${REACTOS_ISO_URL:?}"
 RUN printf '%s' "${REACTOS_ISO_CHECKSUM:?}  /tmp/reactos.zip" | sha256sum -c
 RUN unzip -p /tmp/reactos.zip 'ReactOS-*.iso' > /tmp/reactos.iso
