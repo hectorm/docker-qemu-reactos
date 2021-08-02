@@ -1,8 +1,11 @@
+m4_changequote([[, ]])
+
 ##################################################
 ## "build" stage
 ##################################################
 
-FROM docker.io/ubuntu:20.04 AS build
+m4_ifdef([[CROSS_ARCH]], [[FROM docker.io/CROSS_ARCH/ubuntu:20.04]], [[FROM docker.io/ubuntu:20.04]]) AS build
+m4_ifdef([[CROSS_QEMU]], [[COPY --from=docker.io/hectormolinero/qemu-user-static:latest CROSS_QEMU CROSS_QEMU]])
 
 # Install system packages
 RUN export DEBIAN_FRONTEND=noninteractive \
@@ -37,10 +40,11 @@ RUN printf '%s' "${REACTOS_ISO_CHECKSUM:?}  /tmp/reactos.zip" | sha256sum -c
 RUN unzip -p /tmp/reactos.zip 'ReactOS-*.iso' > /tmp/reactos.iso
 
 ##################################################
-## "qemu-reactos" stage
+## "main" stage
 ##################################################
 
-FROM docker.io/ubuntu:20.04 AS qemu-reactos
+m4_ifdef([[CROSS_ARCH]], [[FROM docker.io/CROSS_ARCH/ubuntu:20.04]], [[FROM docker.io/ubuntu:20.04]]) AS main
+m4_ifdef([[CROSS_QEMU]], [[COPY --from=docker.io/hectormolinero/qemu-user-static:latest CROSS_QEMU CROSS_QEMU]])
 
 # Install system packages
 RUN export DEBIAN_FRONTEND=noninteractive \
