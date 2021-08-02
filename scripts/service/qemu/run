@@ -3,15 +3,15 @@
 set -eu
 
 QEMU=$(command -v qemu-system-x86_64)
-QEMU_ARGS="${QEMU_ARGS-} -smp ${QEMU_CPU:?} -m ${QEMU_RAM:?}"
+QEMU_ARGS="${QEMU_ARGS-} -smp ${QEMU_VM_CPU:?} -m ${QEMU_VM_RAM:?}"
 QEMU_ARGS="${QEMU_ARGS-} -vga std -display vnc=:0"
-QEMU_ARGS="${QEMU_ARGS-} -drive file=/var/lib/qemu/images/reactos.img,index=0,media=disk,format=${QEMU_DISK_FORMAT:?}"
+QEMU_ARGS="${QEMU_ARGS-} -drive file=/var/lib/qemu/images/reactos.img,index=0,media=disk,format=${QEMU_VM_DISK_FORMAT:?}"
 QEMU_ARGS="${QEMU_ARGS-} -drive file=/var/lib/qemu/iso/reactos.iso,index=2,media=cdrom,format=raw"
-QEMU_ARGS="${QEMU_ARGS-} -boot order=${QEMU_BOOT_ORDER:?},menu=${QEMU_BOOT_MENU:?},splash-time=5000"
-QEMU_ARGS="${QEMU_ARGS-} -netdev user,id=n0,${QEMU_NET_OPTIONS:?} -device ${QEMU_NET_DEVICE:?},netdev=n0"
+QEMU_ARGS="${QEMU_ARGS-} -boot order=${QEMU_VM_BOOT_ORDER:?},menu=${QEMU_VM_BOOT_MENU:?},splash-time=5000"
+QEMU_ARGS="${QEMU_ARGS-} -netdev user,id=n0,${QEMU_VM_NET_OPTIONS:?} -device ${QEMU_VM_NET_DEVICE:?},netdev=n0"
 QEMU_ARGS="${QEMU_ARGS-} -usb -device usb-tablet"
-QEMU_ARGS="${QEMU_ARGS-} -k ${QEMU_KEYBOARD:?}"
-if [ "${QEMU_KVM:?}" = true ]; then QEMU_ARGS="${QEMU_ARGS-} -enable-kvm"; fi
+QEMU_ARGS="${QEMU_ARGS-} -k ${QEMU_VM_KEYBOARD:?}"
+if [ "${QEMU_VM_KVM:?}" = true ]; then QEMU_ARGS="${QEMU_ARGS-} -enable-kvm"; fi
 
 cd /var/lib/qemu/
 exec 2>&1
