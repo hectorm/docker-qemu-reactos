@@ -8,7 +8,7 @@ docker run --detach \
   --name qemu-reactos \
   --restart on-failure:3 \
   --publish 127.0.0.1:6080:6080/tcp \
-  --privileged --env QEMU_VM_KVM=true \
+  --env QEMU_VM_KVM=true --device /dev/kvm \
   docker.io/hectormolinero/qemu-reactos:latest
 ```
 > The instance will be available through a web browser from: http://localhost:6080/vnc.html
@@ -40,7 +40,7 @@ VM boot menu (`off` by default).
 
 #### `QEMU_VM_KVM`
 Start QEMU in KVM mode (`false` by default).
-> The `--privileged` option is required to use KVM in the container.
+> The `--device /dev/kvm` option is required to use KVM in the container.
 
 ## License
 See the [license](LICENSE.md) file.

@@ -11,7 +11,10 @@ QEMU_ARGS="${QEMU_ARGS-} -boot order=${QEMU_VM_BOOT_ORDER:?},menu=${QEMU_VM_BOOT
 QEMU_ARGS="${QEMU_ARGS-} -netdev user,id=n0,${QEMU_VM_NET_OPTIONS:?} -device ${QEMU_VM_NET_DEVICE:?},netdev=n0"
 QEMU_ARGS="${QEMU_ARGS-} -usb -device usb-tablet"
 QEMU_ARGS="${QEMU_ARGS-} -k ${QEMU_VM_KEYBOARD:?}"
-if [ "${QEMU_VM_KVM:?}" = true ]; then QEMU_ARGS="${QEMU_ARGS-} -enable-kvm"; fi
+
+if [ "${QEMU_VM_KVM:?}" = true ] && [ -c /dev/kvm ]; then
+	QEMU_ARGS="${QEMU_ARGS-} -enable-kvm"
+fi
 
 cd /var/lib/qemu/
 exec 2>&1
