@@ -81,8 +81,12 @@ COPY --from=build --chown=root:root /tmp/reactos.iso /var/lib/qemu/iso/reactos.i
 
 # Copy services
 COPY --chown=root:root ./scripts/service/ /etc/service/
+RUN find /etc/service/ -type d -not -perm 0755 -exec chmod 0755 '{}' ';'
+RUN find /etc/service/ -type f -not -perm 0755 -exec chmod 0755 '{}' ';'
 
 # Copy bin scripts
 COPY --chown=root:root ./scripts/bin/ /usr/local/bin/
+RUN find /usr/local/bin/ -type d -not -perm 0755 -exec chmod 0755 '{}' ';'
+RUN find /usr/local/bin/ -type f -not -perm 0755 -exec chmod 0755 '{}' ';'
 
 ENTRYPOINT ["/usr/local/bin/container-init"]
