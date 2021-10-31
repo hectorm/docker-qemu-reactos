@@ -39,8 +39,7 @@ printf -- '%s\n' "Creating \"${CONTAINER_NAME:?}\" container..."
 	--log-opt max-size=32m \
 	--publish '127.0.0.1:5900:5900/tcp' \
 	--publish '127.0.0.1:6080:6080/tcp' \
-	--publish '127.0.0.1:15900:15900/tcp' \
-	--env QEMU_VM_KVM=true --device /dev/kvm \
+	--env VM_KVM=true --device /dev/kvm \
 	"${IMAGE_NAME:?}" "$@" >/dev/null
 
 printf -- '%s\n\n' 'Done!'

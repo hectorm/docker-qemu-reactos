@@ -59,16 +59,13 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 	&& rm -rf /var/lib/apt/lists/*
 
 # Environment
-ENV QEMU_VM_CPU=2
-ENV QEMU_VM_RAM=1024M
-ENV QEMU_VM_DISK_SIZE=16G
-ENV QEMU_VM_DISK_FORMAT=qcow2
-ENV QEMU_VM_KEYBOARD=en-us
-ENV QEMU_VM_NET_DEVICE=e1000
-ENV QEMU_VM_NET_OPTIONS=hostfwd=tcp::13389-:3389,hostfwd=tcp::15900-:5900
-ENV QEMU_VM_BOOT_ORDER=cd
-ENV QEMU_VM_BOOT_MENU=off
-ENV QEMU_VM_KVM=false
+ENV VM_CPU=2
+ENV VM_RAM=1024M
+ENV VM_DISK_SIZE=16G
+ENV VM_KEYBOARD=en-us
+ENV VM_NET_OPTIONS=hostfwd=tcp::13389-:3389,hostfwd=tcp::15900-:5900
+ENV VM_BOOT_ORDER=cd
+ENV VM_KVM=false
 
 # Create some directories for QEMU
 RUN mkdir -p /var/lib/qemu/iso/ /var/lib/qemu/images/
@@ -85,12 +82,7 @@ COPY --from=build --chown=root:root /tmp/reactos.iso /var/lib/qemu/iso/reactos.i
 # Copy services
 COPY --chown=root:root ./scripts/service/ /etc/service/
 
-# Copy scripts
+# Copy bin scripts
 COPY --chown=root:root ./scripts/bin/ /usr/local/bin/
 
-# VNC
-EXPOSE 5900/tcp
-# noVNC
-EXPOSE 6080/tcp
-
-CMD ["/usr/local/bin/container-foreground-cmd"]
+ENTRYPOINT ["/usr/local/bin/container-init"]

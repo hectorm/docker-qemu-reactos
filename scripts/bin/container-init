@@ -4,7 +4,7 @@ set -eu
 
 # Create ReactOS disk
 if [ ! -f /var/lib/qemu/images/reactos.img ]; then
-	qemu-img create -f "${QEMU_VM_DISK_FORMAT:?}" /var/lib/qemu/images/reactos.img "${QEMU_VM_DISK_SIZE:?}"
+	qemu-img create -f qcow2 /var/lib/qemu/images/reactos.img "${VM_DISK_SIZE:?}"
 fi
 
 # Start all services
