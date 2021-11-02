@@ -6,8 +6,8 @@ A Docker image for the [ReactOS](https://www.reactos.org) operating system.
 ```sh
 docker run --detach \
   --name qemu-reactos \
+  --device /dev/kvm \
   --publish 127.0.0.1:6080:6080/tcp \
-  --env VM_KVM=true --device /dev/kvm \
   docker.io/hectormolinero/qemu-reactos:latest
 ```
 
@@ -31,8 +31,8 @@ VM keyboard layout (`en-us` by default).
 VM boot order (`cd` by default).
 
 #### `VM_KVM`
-Start QEMU in KVM mode (`false` by default).
-> The `--device /dev/kvm` option is required to use KVM in the container.
+Start QEMU in KVM mode (`true` by default).
+> The `--device /dev/kvm` option is required for this variable to take effect.
 
 ## License
 See the [license](LICENSE.md) file.
