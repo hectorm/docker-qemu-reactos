@@ -37,7 +37,7 @@ ProductOption = 0
 DisableGeckoInst = no
 
 [GuiRunOnce]
-%SystemRoot%\system32\shutdown.exe /s /t 5
+D:\reactos\unattend.bat
 
 [Display]
 BitsPerPel = 32
