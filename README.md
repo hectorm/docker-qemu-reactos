@@ -7,12 +7,14 @@ A Docker image for the [ReactOS](https://www.reactos.org) operating system.
 docker run --detach \
   --name qemu-reactos \
   --device /dev/kvm \
+  --publish 127.0.0.1:5900:5900/tcp \
   --publish 127.0.0.1:6080:6080/tcp \
   docker.io/hectormolinero/qemu-reactos:latest
 ```
 
 > The instance can be accessed from:
-> * 6080/TCP (noVNC): http://127.0.0.1:6080/vnc.html
+> * VNC (5900/TCP): any VNC client, without credentials.
+> * noVNC (6080/TCP): http://127.0.0.1:6080/vnc.html
 
 ## Environment variables
 #### `VM_CPU`
