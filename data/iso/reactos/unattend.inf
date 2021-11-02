@@ -1,0 +1,46 @@
+[Unattend]
+Signature = "$ReactOS$"
+
+UnattendSetupEnabled = yes
+
+DestinationDiskNumber = 0
+DestinationPartitionNumber = 1
+InstallationDirectory = ReactOS
+AutoPartition = 1
+FormatPartition = 1
+; 0: FAT
+; 1: BtrFS
+FsType = 0
+; 0: Skips MBR installation
+; 1: Install MBR on floppy
+; 2: Install MBR on hdd
+MBRInstallType = 2
+
+FullName = "Owner"
+OrgName = "Org"
+ComputerName = "REACTOS"
+; AdminPassword = "password"
+
+; TimeZoneIndex lists:
+; https://docs.microsoft.com/en-us/previous-versions/windows/embedded/ms912053(v=winembedded.10)
+TimeZoneIndex = 85
+DisableAutoDaylightTimeSet = 1
+
+; LocaleID lists:
+; https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-lcid/a9eac961-e77d-41a6-90a5-ce1a8b0cdb9c
+LocaleID = 409
+
+; 0: ReactOS Server
+; 1: ReactOS Workstation
+ProductOption = 0
+
+DisableGeckoInst = no
+
+[GuiRunOnce]
+%SystemRoot%\system32\shutdown.exe /s /t 5
+
+[Display]
+BitsPerPel = 32
+XResolution = 1440
+YResolution = 900
+VRefresh = 0

@@ -2,11 +2,6 @@
 
 set -eu
 
-# Create ReactOS disk
-if [ ! -f /var/lib/qemu/images/reactos.img ]; then
-	qemu-img create -f qcow2 /var/lib/qemu/images/reactos.img "${VM_DISK_SIZE:?}"
-fi
-
 stop() {
 	for s in "${SVDIR:?}"/*; do sv force-stop "${s:?}" >/dev/null 2>&1; done
 	kill -HUP "${RUNSVDIRPID:?}"; wait "${RUNSVDIRPID:?}"

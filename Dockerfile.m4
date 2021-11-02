@@ -12,7 +12,10 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 	&& apt-get install -y --no-install-recommends \
 		ca-certificates \
 		curl \
-		unzip \
+		genisoimage \
+		p7zip-full \
+		qemu-system-x86 \
+		qemu-utils \
 	&& rm -rf /var/lib/apt/lists/*
 
 # Download noVNC
@@ -36,7 +39,18 @@ ARG REACTOS_ISO_URL=https://downloads.sourceforge.net/project/reactos/ReactOS/0.
 ARG REACTOS_ISO_CHECKSUM=ec2776422ed45f8ee7488030eadd7ea40b4276cee04c5e5e5a3f1a5a68c978a7
 RUN curl -Lo /tmp/reactos.zip "${REACTOS_ISO_URL:?}"
 RUN printf '%s' "${REACTOS_ISO_CHECKSUM:?}  /tmp/reactos.zip" | sha256sum -c
-RUN unzip -p /tmp/reactos.zip 'ReactOS-*.iso' > /tmp/reactos.iso
+RUN 7z e /tmp/reactos.zip -so '*.iso' > /tmp/reactos.iso \
+	&& 7z x /tmp/reactos.iso -o/tmp/reactos/ \
+	&& rm -f /tmp/reactos.iso
+COPY --chown=root:root ./data/iso/ /tmp/reactos/
+RUN mkisofs -no-emul-boot -iso-level 4 -eltorito-boot loader/isoboot.bin -o /tmp/reactos.iso /tmp/reactos/ \
+	&& qemu-img create -f qcow2 /tmp/reactos.qcow2 124G \
+	&& timeout 900 qemu-system-x86_64 \
+		-accel tcg -smp 2 -m 512 -serial stdio -display none \
+		-drive file=/tmp/reactos.qcow2,index=0,media=disk,format=qcow2 \
+		-drive file=/tmp/reactos.iso,index=2,media=cdrom,format=raw \
+		-boot order=cd,menu=off \
+		-netdev user,id=n0 -device e1000,netdev=n0
 
 ##################################################
 ## "main" stage
@@ -63,15 +77,10 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 # Environment
 ENV VM_CPU=2
 ENV VM_RAM=1024M
-ENV VM_DISK_SIZE=16G
 ENV VM_KEYBOARD=en-us
 ENV VM_NET_OPTIONS=hostfwd=tcp::13389-:3389,hostfwd=tcp::15900-:5900
-ENV VM_BOOT_ORDER=cd
 ENV VM_KVM=true
 ENV SVDIR=/etc/service/
-
-# Create some directories for QEMU
-RUN mkdir -p /var/lib/qemu/iso/ /var/lib/qemu/images/
 
 # Copy noVNC
 COPY --from=build --chown=root:root /tmp/novnc/ /opt/novnc/
@@ -79,8 +88,8 @@ COPY --from=build --chown=root:root /tmp/novnc/ /opt/novnc/
 # Copy Websockify
 COPY --from=build --chown=root:root /tmp/websockify/ /opt/novnc/utils/websockify/
 
-# Copy ReactOS ISO
-COPY --from=build --chown=root:root /tmp/reactos.iso /var/lib/qemu/iso/reactos.iso
+# Copy ReactOS disk
+COPY --from=build --chown=root:root /tmp/reactos.qcow2 /var/lib/qemu/reactos.qcow2
 
 # Copy services
 COPY --chown=root:root ./scripts/service/ /etc/service/

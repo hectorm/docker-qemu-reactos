@@ -23,14 +23,8 @@ Number of cores the VM is permitted to use (`2` by default).
 #### `VM_RAM`
 Amount of memory the VM is permitted to use (`1024M` by default).
 
-#### `VM_DISK_SIZE`
-VM disk size (`16G` by default).
-
 #### `VM_KEYBOARD`
 VM keyboard layout (`en-us` by default).
-
-#### `VM_BOOT_ORDER`
-VM boot order (`cd` by default).
 
 #### `VM_KVM`
 Start QEMU in KVM mode (`true` by default).
