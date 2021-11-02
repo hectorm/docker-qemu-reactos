@@ -66,6 +66,7 @@ ENV VM_KEYBOARD=en-us
 ENV VM_NET_OPTIONS=hostfwd=tcp::13389-:3389,hostfwd=tcp::15900-:5900
 ENV VM_BOOT_ORDER=cd
 ENV VM_KVM=true
+ENV SVDIR=/etc/service/
 
 # Create some directories for QEMU
 RUN mkdir -p /var/lib/qemu/iso/ /var/lib/qemu/images/
