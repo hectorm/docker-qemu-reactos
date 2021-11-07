@@ -34,6 +34,24 @@ RUN curl -Lo /tmp/websockify.tgz "${WEBSOCKIFY_TARBALL_URL:?}"
 RUN printf '%s' "${WEBSOCKIFY_TARBALL_CHECKSUM:?}  /tmp/websockify.tgz" | sha256sum -c
 RUN mkdir /tmp/websockify/ && tar -xzf /tmp/websockify.tgz --strip-components=1 -C /tmp/websockify/
 
+# Download Samba for ReactOS
+ARG SAMBA_EXE_URL=https://svn.reactos.org/packages/samba-for-ReactOSv1.3.exe
+ARG SAMBA_EXE_CHECKSUM=c3f55cd7a4069cd682cbdca3954c425f6657e3a1aba786e3d1559448e9f849a3
+RUN curl -Lo /tmp/samba.exe "${SAMBA_EXE_URL:?}"
+RUN printf '%s' "${SAMBA_EXE_CHECKSUM:?}  /tmp/samba.exe" | sha256sum -c
+
+# Download BusyBox for Windows
+ARG BUSYBOX_EXE_URL=https://frippery.org/files/busybox/busybox-w32-FRP-4487-gd239d2d52.exe
+ARG BUSYBOX_EXE_CHECKSUM=35e2b0db6d57a045188b9afc617aae52a6c8e2aa0205256c049f3537a48f879b
+RUN curl -Lo /tmp/busybox.exe "${BUSYBOX_EXE_URL:?}"
+RUN printf '%s' "${BUSYBOX_EXE_CHECKSUM:?}  /tmp/busybox.exe" | sha256sum -c
+
+# Download ncat for Windows
+ARG NCAT_ZIP_URL=https://nmap.org/dist/ncat-portable-5.59BETA1.zip
+ARG NCAT_ZIP_CHECKSUM=9cdc2e688410f4563af7002d8dfa3f8a5710f15f6d409be2cab4e87890c91d1c
+RUN curl -Lo /tmp/ncat.zip "${NCAT_ZIP_URL:?}"
+RUN printf '%s' "${NCAT_ZIP_CHECKSUM:?}  /tmp/ncat.zip" | sha256sum -c
+
 # Download ReactOS ISO
 ARG REACTOS_ISO_URL=https://downloads.sourceforge.net/project/reactos/ReactOS/0.4.14/ReactOS-0.4.14-RC-117-g5e81087-iso.zip
 ARG REACTOS_ISO_CHECKSUM=ec2776422ed45f8ee7488030eadd7ea40b4276cee04c5e5e5a3f1a5a68c978a7
@@ -43,8 +61,11 @@ RUN 7z e /tmp/reactos.zip -so '*.iso' > /tmp/reactos.iso \
 	&& 7z x /tmp/reactos.iso -o/tmp/reactos/ \
 	&& rm -f /tmp/reactos.iso
 COPY --chown=root:root ./data/iso/ /tmp/reactos/
+RUN cp /tmp/samba.exe /tmp/reactos/reactos/3rdParty/samba.exe
+RUN cp /tmp/busybox.exe /tmp/reactos/reactos/3rdParty/busybox.exe
+RUN 7z e /tmp/ncat.zip -so '**/*.exe' > /tmp/reactos/reactos/3rdParty/ncat.exe
 RUN mkisofs -no-emul-boot -iso-level 4 -eltorito-boot loader/isoboot.bin -o /tmp/reactos.iso /tmp/reactos/ \
-	&& qemu-img create -f qcow2 /tmp/reactos.qcow2 124G \
+	&& qemu-img create -f qcow2 /tmp/reactos.qcow2 128G \
 	&& timeout 900 qemu-system-x86_64 \
 		-accel tcg -smp 2 -m 512 -serial stdio -display none \
 		-drive file=/tmp/reactos.qcow2,index=0,media=disk,format=qcow2 \
@@ -53,10 +74,10 @@ RUN mkisofs -no-emul-boot -iso-level 4 -eltorito-boot loader/isoboot.bin -o /tmp
 		-netdev user,id=n0 -device e1000,netdev=n0
 
 ##################################################
-## "main" stage
+## "base" stage
 ##################################################
 
-m4_ifdef([[CROSS_ARCH]], [[FROM docker.io/CROSS_ARCH/ubuntu:20.04]], [[FROM docker.io/ubuntu:20.04]]) AS main
+m4_ifdef([[CROSS_ARCH]], [[FROM docker.io/CROSS_ARCH/ubuntu:20.04]], [[FROM docker.io/ubuntu:20.04]]) AS base
 m4_ifdef([[CROSS_QEMU]], [[COPY --from=docker.io/hectormolinero/qemu-user-static:latest CROSS_QEMU CROSS_QEMU]])
 
 # Install system packages
@@ -70,7 +91,9 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 		qemu-kvm \
 		qemu-system-x86 \
 		qemu-utils \
+		rlwrap \
 		runit \
+		samba \
 		tini \
 	&& rm -rf /var/lib/apt/lists/*
 
@@ -78,7 +101,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 ENV VM_CPU=2
 ENV VM_RAM=1024M
 ENV VM_KEYBOARD=en-us
-ENV VM_NET_OPTIONS=hostfwd=tcp::13389-:3389,hostfwd=tcp::15900-:5900
+ENV VM_NET_OPTIONS=
 ENV VM_KVM=true
 ENV SVDIR=/etc/service/
 
@@ -91,6 +114,11 @@ COPY --from=build --chown=root:root /tmp/websockify/ /opt/novnc/utils/websockify
 # Copy ReactOS disk
 COPY --from=build --chown=root:root /tmp/reactos.qcow2 /var/lib/qemu/reactos.qcow2
 
+# Copy Samba config
+COPY --chown=root:root ./config/samba/ /etc/samba/
+RUN find /etc/samba/ -type d -not -perm 0755 -exec chmod 0755 '{}' ';'
+RUN find /etc/samba/ -type f -not -perm 0644 -exec chmod 0644 '{}' ';'
+
 # Copy services
 COPY --chown=root:root ./scripts/service/ /etc/service/
 RUN find /etc/service/ -type d -not -perm 0755 -exec chmod 0755 '{}' ';'
@@ -102,3 +130,24 @@ RUN find /usr/local/bin/ -type d -not -perm 0755 -exec chmod 0755 '{}' ';'
 RUN find /usr/local/bin/ -type f -not -perm 0755 -exec chmod 0755 '{}' ';'
 
 ENTRYPOINT ["/usr/bin/tini", "--", "/usr/local/bin/container-init"]
+
+##################################################
+## "test" stage
+##################################################
+
+FROM base AS test
+
+RUN container-init & \
+	printf '%s\n' \
+		'systeminfo' \
+		'smbclient -c "ls;quit" //10.0.2.254/share noop' \
+		'exit' | timeout 900 vmshell || exit 1
+
+##################################################
+## "main" stage
+##################################################
+
+FROM base AS main
+
+# Dummy instruction so BuildKit does not skip the test stage
+RUN --mount=type=bind,from=test,source=/mnt/,target=/mnt/

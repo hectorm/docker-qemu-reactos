@@ -6,7 +6,7 @@ set --
 set -- "$@" -smp "${VM_CPU:?}" -m "${VM_RAM:?}"
 set -- "$@" -serial stdio -monitor unix:/run/qemu-monitor,server,nowait -device VGA -display vnc=:0
 set -- "$@" -drive file=/var/lib/qemu/reactos.qcow2,index=0,media=disk,format=qcow2
-set -- "$@" -netdev user,id=n0,"${VM_NET_OPTIONS?}"
+set -- "$@" -netdev user,id=n0,guestfwd=tcp:10.0.2.254:445-cmd:'nc 127.0.0.1 445',hostfwd=tcp::5151-:51,"${VM_NET_OPTIONS?}"
 set -- "$@" -device e1000,netdev=n0
 set -- "$@" -usb -device usb-tablet
 set -- "$@" -k "${VM_KEYBOARD:?}"
