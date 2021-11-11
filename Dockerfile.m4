@@ -140,11 +140,13 @@ ENTRYPOINT ["/usr/bin/tini", "--", "/usr/local/bin/container-init"]
 
 FROM base AS test
 
-RUN container-init & \
-	printf '%s\n' \
-		'systeminfo' \
-		'smbclient -c "ls;quit" //10.0.2.254/share noop' \
-		'exit' | timeout 900 vmshell || exit 1
+RUN if [ "$(uname -m)" = 'x86_64' ]; then \
+		container-init & \
+		printf '%s\n' 'The quick brown fox jumps over the lazy dog' > /mnt/in || exit 1; \
+		printf '%s\n' '@echo off & smbclient -c "get /in C:/local; quit" //10.0.2.254/share noop & exit' | timeout 900 vmshell || exit 1; \
+		printf '%s\n' '@echo off & smbclient -c "put C:/local /out; quit" //10.0.2.254/share noop & exit' | timeout 120 vmshell || exit 1; \
+		cmp -s /mnt/in /mnt/out || exit 1; \
+	fi
 
 ##################################################
 ## "main" stage
