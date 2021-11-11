@@ -67,11 +67,12 @@ RUN 7z e /tmp/ncat.zip -so '**/*.exe' > /tmp/reactos/reactos/3rdParty/ncat.exe
 RUN mkisofs -no-emul-boot -iso-level 4 -eltorito-boot loader/isoboot.bin -o /tmp/reactos.iso /tmp/reactos/ \
 	&& qemu-img create -f qcow2 /tmp/reactos.qcow2 128G \
 	&& timeout 900 qemu-system-x86_64 \
-		-accel tcg -smp 2 -m 512 -serial stdio -display none \
+		-accel tcg -smp 2 -m 512M \
+		-serial stdio -device VGA -display none \
+		-device e1000,netdev=n0 -netdev user,id=n0,restrict=on \
 		-drive file=/tmp/reactos.qcow2,index=0,media=disk,format=qcow2 \
 		-drive file=/tmp/reactos.iso,index=2,media=cdrom,format=raw \
-		-boot order=cd,menu=off \
-		-netdev user,id=n0 -device e1000,netdev=n0
+		-boot order=cd,menu=off -usb -device usb-tablet
 
 ##################################################
 ## "base" stage
