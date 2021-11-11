@@ -53,8 +53,8 @@ RUN curl -Lo /tmp/ncat.zip "${NCAT_ZIP_URL:?}"
 RUN printf '%s' "${NCAT_ZIP_CHECKSUM:?}  /tmp/ncat.zip" | sha256sum -c
 
 # Download ReactOS ISO
-ARG REACTOS_ISO_URL=https://downloads.sourceforge.net/project/reactos/ReactOS/0.4.14/ReactOS-0.4.14-RC-117-g5e81087-iso.zip
-ARG REACTOS_ISO_CHECKSUM=ec2776422ed45f8ee7488030eadd7ea40b4276cee04c5e5e5a3f1a5a68c978a7
+ARG REACTOS_ISO_URL=https://downloads.sourceforge.net/project/reactos/ReactOS/0.4.14/ReactOS-0.4.14-RC-118-gfef1907-iso.zip
+ARG REACTOS_ISO_CHECKSUM=751984454d54f16d39b02e4cfa88ce8adb4a5e666e985a137257fc9980047d65
 RUN curl -Lo /tmp/reactos.zip "${REACTOS_ISO_URL:?}"
 RUN printf '%s' "${REACTOS_ISO_CHECKSUM:?}  /tmp/reactos.zip" | sha256sum -c
 RUN 7z e /tmp/reactos.zip -so '*.iso' > /tmp/reactos.iso \
