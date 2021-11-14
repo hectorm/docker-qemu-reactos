@@ -52,7 +52,7 @@ ARG NCAT_ZIP_CHECKSUM=9cdc2e688410f4563af7002d8dfa3f8a5710f15f6d409be2cab4e87890
 RUN curl -Lo /tmp/ncat.zip "${NCAT_ZIP_URL:?}"
 RUN printf '%s' "${NCAT_ZIP_CHECKSUM:?}  /tmp/ncat.zip" | sha256sum -c
 
-# Download ReactOS ISO
+# Download and install ReactOS
 ARG REACTOS_ISO_URL=https://downloads.sourceforge.net/project/reactos/ReactOS/0.4.14/ReactOS-0.4.14-RC-118-gfef1907-iso.zip
 ARG REACTOS_ISO_CHECKSUM=751984454d54f16d39b02e4cfa88ce8adb4a5e666e985a137257fc9980047d65
 RUN curl -Lo /tmp/reactos.zip "${REACTOS_ISO_URL:?}"
@@ -67,7 +67,7 @@ RUN 7z e /tmp/ncat.zip -so '**/*.exe' > /tmp/reactos/reactos/3rdParty/ncat.exe
 RUN mkisofs -no-emul-boot -iso-level 4 -eltorito-boot loader/isoboot.bin -o /tmp/reactos.iso /tmp/reactos/ \
 	&& qemu-img create -f qcow2 /tmp/reactos.qcow2 128G \
 	&& timeout 900 qemu-system-x86_64 \
-		-accel tcg -smp 2 -m 512M \
+		-machine pc -smp 2 -m 512M -accel tcg \
 		-serial stdio -device VGA -display none \
 		-device e1000,netdev=n0 -netdev user,id=n0,restrict=on \
 		-drive file=/tmp/reactos.qcow2,index=0,media=disk,format=qcow2 \
