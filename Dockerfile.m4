@@ -115,7 +115,7 @@ COPY --from=build --chown=root:root /tmp/novnc/ /opt/novnc/
 COPY --from=build --chown=root:root /tmp/websockify/ /opt/novnc/utils/websockify/
 
 # Copy ReactOS disk
-COPY --from=build --chown=root:root /tmp/reactos.qcow2 /var/lib/qemu/reactos.qcow2
+COPY --from=build --chown=root:root /tmp/reactos.qcow2 /var/lib/qemu/image/reactos.qcow2
 
 # Copy Samba config
 COPY --chown=root:root ./config/samba/ /etc/samba/
