@@ -10,9 +10,12 @@ FROM docker.io/ubuntu:20.04 AS build
 RUN export DEBIAN_FRONTEND=noninteractive \
 	&& apt-get update \
 	&& apt-get install -y --no-install-recommends \
+		binutils-mingw-w64-i686 \
 		ca-certificates \
 		curl \
+		gcc-mingw-w64-i686 \
 		genisoimage \
+		make \
 		p7zip-full \
 		qemu-system-x86 \
 		qemu-utils \
@@ -34,23 +37,32 @@ RUN curl -Lo /tmp/websockify.tgz "${WEBSOCKIFY_TARBALL_URL:?}"
 RUN printf '%s' "${WEBSOCKIFY_TARBALL_CHECKSUM:?}  /tmp/websockify.tgz" | sha256sum -c
 RUN mkdir /tmp/websockify/ && tar -xzf /tmp/websockify.tgz --strip-components=1 -C /tmp/websockify/
 
-# Download Samba for ReactOS
+# Download and build srvany-ng
+ARG SRVANY_NG_TARBALL_URL=https://github.com/hectorm/srvany-ng/archive/refs/tags/v1.0.tar.gz
+ARG SRVANY_NG_TARBALL_CHECKSUM=62d4c85d5dbef86d57bf5d21ff913bce81b821735df293968e1706f85096c8b0
+RUN curl -Lo /tmp/srvany-ng.tgz "${SRVANY_NG_TARBALL_URL:?}"
+RUN printf '%s' "${SRVANY_NG_TARBALL_CHECKSUM:?}  /tmp/srvany-ng.tgz" | sha256sum -c
+RUN mkdir /tmp/srvany-ng/ && tar -xzf /tmp/srvany-ng.tgz --strip-components=1 -C /tmp/srvany-ng/
+RUN make -C /tmp/srvany-ng/ build
+
+# Download ncat
+ARG NCAT_ZIP_URL=https://nmap.org/dist/ncat-portable-5.59BETA1.zip
+ARG NCAT_ZIP_CHECKSUM=9cdc2e688410f4563af7002d8dfa3f8a5710f15f6d409be2cab4e87890c91d1c
+RUN curl -Lo /tmp/ncat.zip "${NCAT_ZIP_URL:?}"
+RUN printf '%s' "${NCAT_ZIP_CHECKSUM:?}  /tmp/ncat.zip" | sha256sum -c
+RUN 7z e /tmp/ncat.zip -so '**/*.exe' > /tmp/ncat.exe
+
+# Download Samba
 ARG SAMBA_EXE_URL=https://svn.reactos.org/packages/samba-for-ReactOSv1.3.exe
 ARG SAMBA_EXE_CHECKSUM=c3f55cd7a4069cd682cbdca3954c425f6657e3a1aba786e3d1559448e9f849a3
 RUN curl -Lo /tmp/samba.exe "${SAMBA_EXE_URL:?}"
 RUN printf '%s' "${SAMBA_EXE_CHECKSUM:?}  /tmp/samba.exe" | sha256sum -c
 
-# Download BusyBox for Windows
+# Download BusyBox
 ARG BUSYBOX_EXE_URL=https://frippery.org/files/busybox/busybox-w32-FRP-4487-gd239d2d52.exe
 ARG BUSYBOX_EXE_CHECKSUM=35e2b0db6d57a045188b9afc617aae52a6c8e2aa0205256c049f3537a48f879b
 RUN curl -Lo /tmp/busybox.exe "${BUSYBOX_EXE_URL:?}"
 RUN printf '%s' "${BUSYBOX_EXE_CHECKSUM:?}  /tmp/busybox.exe" | sha256sum -c
-
-# Download ncat for Windows
-ARG NCAT_ZIP_URL=https://nmap.org/dist/ncat-portable-5.59BETA1.zip
-ARG NCAT_ZIP_CHECKSUM=9cdc2e688410f4563af7002d8dfa3f8a5710f15f6d409be2cab4e87890c91d1c
-RUN curl -Lo /tmp/ncat.zip "${NCAT_ZIP_URL:?}"
-RUN printf '%s' "${NCAT_ZIP_CHECKSUM:?}  /tmp/ncat.zip" | sha256sum -c
 
 # Download and install ReactOS
 ARG REACTOS_ISO_URL=https://sourceforge.net/projects/reactos/files/ReactOS/0.4.14/ReactOS-0.4.14-RC-122-ge7cfa90-iso.zip
@@ -61,9 +73,10 @@ RUN 7z e /tmp/reactos.zip -so '*.iso' > /tmp/reactos.iso \
 	&& 7z x /tmp/reactos.iso -o/tmp/reactos/ \
 	&& rm -f /tmp/reactos.iso
 COPY --chown=root:root ./data/iso/ /tmp/reactos/
-RUN cp /tmp/samba.exe /tmp/reactos/reactos/3rdParty/samba.exe
-RUN cp /tmp/busybox.exe /tmp/reactos/reactos/3rdParty/busybox.exe
-RUN 7z e /tmp/ncat.zip -so '**/*.exe' > /tmp/reactos/reactos/3rdParty/ncat.exe
+RUN install -D /tmp/srvany-ng/srvany-ng.exe /tmp/reactos/reactos/3rdParty/srvany-ng.exe
+RUN install -D /tmp/ncat.exe /tmp/reactos/reactos/3rdParty/ncat.exe
+RUN install -D /tmp/samba.exe /tmp/reactos/reactos/3rdParty/samba.exe
+RUN install -D /tmp/busybox.exe /tmp/reactos/reactos/3rdParty/busybox.exe
 RUN mkisofs -no-emul-boot -iso-level 4 -eltorito-boot loader/isoboot.bin -o /tmp/reactos.iso /tmp/reactos/ \
 	&& qemu-img create -f qcow2 /tmp/reactos.qcow2 128G \
 	&& timeout 900 qemu-system-x86_64 \
