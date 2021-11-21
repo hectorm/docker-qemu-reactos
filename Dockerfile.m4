@@ -83,8 +83,8 @@ RUN mkisofs -no-emul-boot -iso-level 4 -eltorito-boot loader/isoboot.bin -o /tmp
 		-machine pc -smp 2 -m 512M -accel tcg \
 		-device VGA -display none -serial stdio \
 		-device e1000,netdev=n0 -netdev user,id=n0,restrict=on \
-		-device ide-hd,bus=ide.0,drive=c0 -blockdev driver=qcow2,node-name=c0,file.driver=file,file.filename=/tmp/reactos.qcow2 \
-		-device ide-cd,bus=ide.1,drive=d0 -blockdev driver=raw,node-name=d0,file.driver=file,file.filename=/tmp/reactos.iso,read-only=on \
+		-device ide-hd,id=disk0,bus=ide.0,drive=disk0 -blockdev driver=qcow2,node-name=disk0,file.driver=file,file.filename=/tmp/reactos.qcow2 \
+		-device ide-cd,id=cd0,bus=ide.1,drive=cd0 -blockdev driver=raw,node-name=cd0,file.driver=file,file.filename=/tmp/reactos.iso,read-only=on \
 		-boot order=cd,menu=off \
 		-usb -device usb-tablet
 
