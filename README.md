@@ -13,9 +13,9 @@ docker run --detach \
 ```
 
 The instance can be accessed from:
- * **VNC (5900/TCP):** any VNC client, without credentials.
- * **noVNC (6080/TCP):** http://127.0.0.1:6080/vnc.html
- * **Shell:** `docker exec -it qemu-reactos vmshell`
+ * **VNC** (`5900/TCP`), without password.
+ * **noVNC** (`6080/TCP`), http://127.0.0.1:6080/vnc.html
+ * `docker exec -it qemu-reactos vmshell`
 
 ## Environment variables
 #### `VM_CPU`
