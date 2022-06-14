@@ -59,8 +59,8 @@ RUN curl -Lo /tmp/samba.exe "${SAMBA_EXE_URL:?}"
 RUN printf '%s' "${SAMBA_EXE_CHECKSUM:?}  /tmp/samba.exe" | sha256sum -c
 
 # Download BusyBox
-ARG BUSYBOX_EXE_URL=https://frippery.org/files/busybox/busybox-w32-FRP-4487-gd239d2d52.exe
-ARG BUSYBOX_EXE_CHECKSUM=35e2b0db6d57a045188b9afc617aae52a6c8e2aa0205256c049f3537a48f879b
+ARG BUSYBOX_EXE_URL=https://frippery.org/files/busybox/busybox-w32-FRP-4716-g31467ddfc.exe
+ARG BUSYBOX_EXE_CHECKSUM=b4fd02bb938f97e59a0242da6a7763104d9cd344f96427af178940271b22ed5c
 RUN curl -Lo /tmp/busybox.exe "${BUSYBOX_EXE_URL:?}"
 RUN printf '%s' "${BUSYBOX_EXE_CHECKSUM:?}  /tmp/busybox.exe" | sha256sum -c
 
