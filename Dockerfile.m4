@@ -82,7 +82,7 @@ RUN mkisofs -no-emul-boot -iso-level 4 -eltorito-boot loader/isoboot.bin -o /tmp
 	&& timeout 900 qemu-system-x86_64 \
 		-machine pc -smp 2 -m 512M -accel tcg \
 		-device VGA -display none -serial stdio \
-		-device e1000,netdev=n0 -netdev user,id=n0,restrict=on \
+		-device e1000,netdev=n0 -netdev user,id=n0,ipv4=on,ipv6=off,net=10.0.2.0/24,host=10.0.2.2,dns=10.0.2.3,dhcpstart=10.0.2.15,restrict=on \
 		-device ide-hd,id=disk0,bus=ide.0,drive=disk0 -blockdev driver=qcow2,node-name=disk0,file.driver=file,file.filename=/tmp/reactos.qcow2 \
 		-device ide-cd,id=cd0,bus=ide.1,drive=cd0 -blockdev driver=raw,node-name=cd0,file.driver=file,file.filename=/tmp/reactos.iso,read-only=on \
 		-boot order=cd,menu=off \
@@ -115,8 +115,6 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 ENV VM_CPU=2
 ENV VM_RAM=1024M
 ENV VM_KEYBOARD=en-us
-ENV VM_NET_GUESTFWD_OPTIONS=guestfwd=tcp:10.0.2.254:445-cmd:"nc 127.0.0.1 445"
-ENV VM_NET_HOSTFWD_OPTIONS=hostfwd=tcp::2323-:23,hostfwd=tcp::5151-:51,hostfwd=tcp::3389-:3389
 ENV VM_NET_EXTRA_OPTIONS=
 ENV VM_KVM=true
 ENV SVDIR=/etc/service/
@@ -156,8 +154,8 @@ FROM base AS test
 RUN if [ "$(uname -m)" = 'x86_64' ]; then \
 		container-init & \
 		printf '%s\n' 'The quick brown fox jumps over the lazy dog' > /mnt/in || exit 1; \
-		printf '%s\n' '@echo off & smbclient -c "get /in C:/local; quit" //10.0.2.254/share noop & exit' | timeout 900 vmshell || exit 1; \
-		printf '%s\n' '@echo off & smbclient -c "put C:/local /out; quit" //10.0.2.254/share noop & exit' | timeout 120 vmshell || exit 1; \
+		printf '%s\n' '@echo off & smbclient -c "get /in C:/local; quit" //10.0.2.2/share noop & exit' | timeout 900 vmshell || exit 1; \
+		printf '%s\n' '@echo off & smbclient -c "put C:/local /out; quit" //10.0.2.2/share noop & exit' | timeout 120 vmshell || exit 1; \
 		cmp -s /mnt/in /mnt/out || exit 1; \
 	fi
 
