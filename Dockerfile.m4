@@ -65,8 +65,8 @@ RUN curl -Lo /tmp/busybox.exe "${BUSYBOX_EXE_URL:?}"
 RUN printf '%s' "${BUSYBOX_EXE_CHECKSUM:?}  /tmp/busybox.exe" | sha256sum -c
 
 # Download and install ReactOS
-ARG REACTOS_ISO_URL=https://downloads.sourceforge.net/reactos/ReactOS-0.4.14-release-19-ga575acb-iso.zip
-ARG REACTOS_ISO_CHECKSUM=afe34548b582a282448fb5cf885c899bf33e27fb72da7203163a0ce3d9d04a55
+ARG REACTOS_ISO_URL=https://downloads.sourceforge.net/reactos/ReactOS-0.4.14-release-23-gc1b15db-iso.zip
+ARG REACTOS_ISO_CHECKSUM=a95950b23efc44f197f47d09b4fc1b89b6f6a2ad08b6964e15dd834184a915de
 RUN curl -Lo /tmp/reactos.zip "${REACTOS_ISO_URL:?}"
 RUN printf '%s' "${REACTOS_ISO_CHECKSUM:?}  /tmp/reactos.zip" | sha256sum -c
 RUN 7z e /tmp/reactos.zip -so '*.iso' > /tmp/reactos.iso \
