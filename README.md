@@ -9,6 +9,7 @@ docker run --detach \
   --device /dev/kvm \
   --publish 127.0.0.1:5900:5900/tcp \
   --publish 127.0.0.1:6080:6080/tcp \
+  --mount type=volume,src=qemu-reactos-disk,dst=/var/lib/qemu/disk/ \
   docker.io/hectorm/qemu-reactos:latest
 ```
 
