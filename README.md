@@ -6,6 +6,7 @@ A Docker image for the [ReactOS](https://www.reactos.org) operating system.
 ```sh
 docker run --detach \
   --name qemu-reactos \
+  --stop-timeout 30 \
   --device /dev/kvm \
   --publish 127.0.0.1:5900:5900/tcp \
   --publish 127.0.0.1:6080:6080/tcp \
