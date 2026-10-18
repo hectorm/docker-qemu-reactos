@@ -11,10 +11,11 @@ FormatPartition = 1
 ; 0: FAT
 ; 1: BtrFS
 FsType = 0
-; 0: Skips MBR installation
-; 1: Install MBR on floppy
-; 2: Install MBR on hdd
-MBRInstallType = 2
+; 0: Skip installation
+; 1: Install on removable media (floppy)
+; 2: Install on system partition (for MBR disks: MBR and VBR)
+; 3: Install on VBR only (for MBR disks)
+BootLoaderLocation = 2
 
 FullName = "Owner"
 OrgName = "Org"
@@ -32,12 +33,15 @@ LocaleID = 409
 
 ; 0: ReactOS Server
 ; 1: ReactOS Workstation
-ProductOption = 0
+; 2: ReactOS Server Core
+InstallationType = 0
 
-DisableGeckoInst = no
+; yes: Download addons from RAPPS
+; no: Don't download addons from RAPPS
+RappsDownload = no
 
 [GuiRunOnce]
-D:\reactos\unattend.bat
+D:\i386\unattend.bat
 
 [Display]
 BitsPerPel = 32

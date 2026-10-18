@@ -84,8 +84,8 @@ RUN <<-EOF
 EOF
 
 # Download and install ReactOS
-ARG REACTOS_ISO_URL=https://downloads.sourceforge.net/reactos/ReactOS-0.4.15-release-1-gdbb43bbaeb2-x86-iso.zip
-ARG REACTOS_ISO_CHECKSUM=2be97d87fd43c93185aa841c1742fe9265c58aba0e517e20122df19d9add1935
+ARG REACTOS_ISO_URL=https://downloads.sourceforge.net/reactos/ReactOS-0.4.16-i386.zip
+ARG REACTOS_ISO_CHECKSUM=e5851510cf5b79ef51a76b8155dd5ef7faca1155f44d0a1d41c35b77ece4ce2a
 RUN <<-EOF
 	curl -Lo /tmp/reactos.zip "${REACTOS_ISO_URL:?}"
 	printf '%s' "${REACTOS_ISO_CHECKSUM:?}  /tmp/reactos.zip" | sha256sum -c
@@ -95,10 +95,12 @@ RUN <<-EOF
 EOF
 COPY --chown=root:root ./data/iso/ /tmp/reactos/
 RUN <<-EOF
-	install -D /tmp/srvany-ng/srvany-ng.exe /tmp/reactos/reactos/3rdParty/srvany-ng.exe
-	install -D /tmp/ncat.exe /tmp/reactos/reactos/3rdParty/ncat.exe
-	install -D /tmp/samba.exe /tmp/reactos/reactos/3rdParty/samba.exe
-	install -D /tmp/busybox.exe /tmp/reactos/reactos/3rdParty/busybox.exe
+	install -D /tmp/srvany-ng/srvany-ng.exe /tmp/reactos/i386/3rdParty/srvany-ng.exe
+	install -D /tmp/ncat.exe /tmp/reactos/i386/3rdParty/ncat.exe
+	install -D /tmp/samba.exe /tmp/reactos/i386/3rdParty/samba.exe
+	install -D /tmp/busybox.exe /tmp/reactos/i386/3rdParty/busybox.exe
+	sed -i 's/^DefaultOS=.*\r$/DefaultOS=Setup\r/' /tmp/reactos/freeldr.ini
+	grep -q '^DefaultOS=Setup' /tmp/reactos/freeldr.ini
 EOF
 RUN <<-EOF
 	mkisofs -no-emul-boot -iso-level 4 -eltorito-boot loader/isoboot.bin -o /tmp/reactos.iso /tmp/reactos/

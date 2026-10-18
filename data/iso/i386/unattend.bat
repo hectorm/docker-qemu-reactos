@@ -1,17 +1,17 @@
 @echo off
 
 :: Install srvany-ng
-copy "D:\reactos\3rdParty\srvany-ng.exe" "%SystemRoot%\bin\srvany-ng.exe"
+copy "D:\i386\3rdParty\srvany-ng.exe" "%SystemRoot%\bin\srvany-ng.exe"
 
 :: Install ncat
-copy "D:\reactos\3rdParty\ncat.exe" "%SystemRoot%\bin\ncat.exe"
+copy "D:\i386\3rdParty\ncat.exe" "%SystemRoot%\bin\ncat.exe"
 
 :: Install Samba
-copy "D:\reactos\3rdParty\samba.exe" "%SystemRoot%\bin\samba.exe"
+copy "D:\i386\3rdParty\samba.exe" "%SystemRoot%\bin\samba.exe"
 "%SystemRoot%\bin\samba.exe" -s
 
 :: Install BusyBox
-copy "D:\reactos\3rdParty\busybox.exe" "%SystemRoot%\bin\busybox.exe"
+copy "D:\i386\3rdParty\busybox.exe" "%SystemRoot%\bin\busybox.exe"
 
 :: Enable BindShell
 reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\BindShell"
