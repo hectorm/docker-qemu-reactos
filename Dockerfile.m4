@@ -29,9 +29,9 @@ RUN <<-EOF
 EOF
 
 # Download noVNC
-ARG NOVNC_VERSION=v1.6.0
+ARG NOVNC_VERSION=v1.7.0
 ARG NOVNC_TARBALL_URL=https://github.com/novnc/noVNC/archive/${NOVNC_VERSION}.tar.gz
-ARG NOVNC_TARBALL_CHECKSUM=5066103959ef4e9b10f37e5a148627360dd8414e4cf8a7db92bdbd022e728aaa
+ARG NOVNC_TARBALL_CHECKSUM=b1003a11b6e6e8d8f7f5e5586daae7f8ca651d8aee0aa155ff9ac841c48f52c6
 RUN <<-EOF
 	curl -Lo /tmp/novnc.tgz "${NOVNC_TARBALL_URL:?}"
 	printf '%s' "${NOVNC_TARBALL_CHECKSUM:?}  /tmp/novnc.tgz" | sha256sum -c
@@ -49,8 +49,8 @@ RUN <<-EOF
 EOF
 
 # Download and build srvany-ng
-ARG SRVANY_NG_TARBALL_URL=https://github.com/hectorm/srvany-ng/archive/refs/tags/v1.0.tar.gz
-ARG SRVANY_NG_TARBALL_CHECKSUM=62d4c85d5dbef86d57bf5d21ff913bce81b821735df293968e1706f85096c8b0
+ARG SRVANY_NG_TARBALL_URL=https://github.com/hectorm/srvany-ng/archive/refs/tags/v1.1.tar.gz
+ARG SRVANY_NG_TARBALL_CHECKSUM=79707e1c8dca927178a316a16a2c87e60a40f74e0c50b15c4d538e5c7ae5538f
 RUN <<-EOF
 	curl -Lo /tmp/srvany-ng.tgz "${SRVANY_NG_TARBALL_URL:?}"
 	printf '%s' "${SRVANY_NG_TARBALL_CHECKSUM:?}  /tmp/srvany-ng.tgz" | sha256sum -c
@@ -76,8 +76,8 @@ RUN <<-EOF
 EOF
 
 # Download BusyBox
-ARG BUSYBOX_EXE_URL=https://frippery.org/files/busybox/busybox-w32-FRP-5579-g5749feb35.exe
-ARG BUSYBOX_EXE_CHECKSUM=497607849a3e581615e46292d9063313d9a27a54380aad60ba2c5328838e3bb6
+ARG BUSYBOX_EXE_URL=https://frippery.org/files/busybox/busybox-w32-FRP-6075-g169694ebd.exe
+ARG BUSYBOX_EXE_CHECKSUM=7bfee530965315665044e6e01db58125f2763c8a39c2e72ba1a6beb6923e0e1f
 RUN <<-EOF
 	curl -Lo /tmp/busybox.exe "${BUSYBOX_EXE_URL:?}"
 	printf '%s' "${BUSYBOX_EXE_CHECKSUM:?}  /tmp/busybox.exe" | sha256sum -c
