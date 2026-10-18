@@ -13,6 +13,9 @@ copy "D:\i386\3rdParty\samba.exe" "%SystemRoot%\bin\samba.exe"
 :: Install BusyBox
 copy "D:\i386\3rdParty\busybox.exe" "%SystemRoot%\bin\busybox.exe"
 
+:: Remove SYSTEM from the Cygwin passwd file, otherwise Samba crashes ReactOS
+"%SystemRoot%\bin\busybox.exe" sed -i "/^SYSTEM:/d" "%ProgramFiles%\samba\etc\passwd"
+
 :: Enable BindShell
 reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\BindShell"
 reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\BindShell" /v DisplayName /t REG_SZ /d "BindShell" /f
