@@ -22,6 +22,8 @@ The instance can be accessed from:
  * **noVNC** (`6080/TCP`), http://127.0.0.1:6080/vnc.html
  * `docker exec -it qemu-reactos vmshell`
 
+Additionally the contents of the `/mnt/` directory in the container will be exposed via SMB on `//10.0.2.2/share` and can be accessed from the VM with `smbclient`, e.g. `smbclient -N -c "get /file C:/file" //10.0.2.2/share`.
+
 ## Environment variables
 #### `VM_CPU`
 Number of cores the VM is permitted to use (`2` by default).
