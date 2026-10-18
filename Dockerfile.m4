@@ -1,3 +1,5 @@
+# syntax=docker.io/docker/dockerfile:1
+
 m4_changequote([[, ]])
 
 ##################################################
@@ -6,10 +8,13 @@ m4_changequote([[, ]])
 
 FROM --platform=${BUILDPLATFORM} docker.io/ubuntu:24.04 AS build
 
+SHELL ["/bin/sh", "-euc"]
+
 # Install system packages
-RUN export DEBIAN_FRONTEND=noninteractive \
-	&& apt-get update \
-	&& apt-get install -y --no-install-recommends \
+RUN <<-EOF
+	export DEBIAN_FRONTEND=noninteractive
+	apt-get update
+	apt-get install -y --no-install-recommends \
 		binutils-mingw-w64-i686 \
 		ca-certificates \
 		curl \
@@ -18,68 +23,86 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 		make \
 		p7zip-full \
 		qemu-system-x86 \
-		qemu-utils \
-	&& rm -rf /var/lib/apt/lists/*
+		qemu-utils
+	rm -rf /var/lib/apt/lists/*
+EOF
 
 # Download noVNC
 ARG NOVNC_VERSION=v1.6.0
 ARG NOVNC_TARBALL_URL=https://github.com/novnc/noVNC/archive/${NOVNC_VERSION}.tar.gz
 ARG NOVNC_TARBALL_CHECKSUM=5066103959ef4e9b10f37e5a148627360dd8414e4cf8a7db92bdbd022e728aaa
-RUN curl -Lo /tmp/novnc.tgz "${NOVNC_TARBALL_URL:?}"
-RUN printf '%s' "${NOVNC_TARBALL_CHECKSUM:?}  /tmp/novnc.tgz" | sha256sum -c
-RUN mkdir /tmp/novnc/ && tar -xzf /tmp/novnc.tgz --strip-components=1 -C /tmp/novnc/
+RUN <<-EOF
+	curl -Lo /tmp/novnc.tgz "${NOVNC_TARBALL_URL:?}"
+	printf '%s' "${NOVNC_TARBALL_CHECKSUM:?}  /tmp/novnc.tgz" | sha256sum -c
+	mkdir /tmp/novnc/ && tar -xzf /tmp/novnc.tgz --strip-components=1 -C /tmp/novnc/
+EOF
 
 # Download Websockify
 ARG WEBSOCKIFY_VERSION=v0.13.0
 ARG WEBSOCKIFY_TARBALL_URL=https://github.com/novnc/websockify/archive/${WEBSOCKIFY_VERSION}.tar.gz
 ARG WEBSOCKIFY_TARBALL_CHECKSUM=b6413e364efd04f3c92ec8c17747e3c4adc20157c2ef1c5d019a26d944a46df8
-RUN curl -Lo /tmp/websockify.tgz "${WEBSOCKIFY_TARBALL_URL:?}"
-RUN printf '%s' "${WEBSOCKIFY_TARBALL_CHECKSUM:?}  /tmp/websockify.tgz" | sha256sum -c
-RUN mkdir /tmp/websockify/ && tar -xzf /tmp/websockify.tgz --strip-components=1 -C /tmp/websockify/
+RUN <<-EOF
+	curl -Lo /tmp/websockify.tgz "${WEBSOCKIFY_TARBALL_URL:?}"
+	printf '%s' "${WEBSOCKIFY_TARBALL_CHECKSUM:?}  /tmp/websockify.tgz" | sha256sum -c
+	mkdir /tmp/websockify/ && tar -xzf /tmp/websockify.tgz --strip-components=1 -C /tmp/websockify/
+EOF
 
 # Download and build srvany-ng
 ARG SRVANY_NG_TARBALL_URL=https://github.com/hectorm/srvany-ng/archive/refs/tags/v1.0.tar.gz
 ARG SRVANY_NG_TARBALL_CHECKSUM=62d4c85d5dbef86d57bf5d21ff913bce81b821735df293968e1706f85096c8b0
-RUN curl -Lo /tmp/srvany-ng.tgz "${SRVANY_NG_TARBALL_URL:?}"
-RUN printf '%s' "${SRVANY_NG_TARBALL_CHECKSUM:?}  /tmp/srvany-ng.tgz" | sha256sum -c
-RUN mkdir /tmp/srvany-ng/ && tar -xzf /tmp/srvany-ng.tgz --strip-components=1 -C /tmp/srvany-ng/
-RUN make -C /tmp/srvany-ng/ build
+RUN <<-EOF
+	curl -Lo /tmp/srvany-ng.tgz "${SRVANY_NG_TARBALL_URL:?}"
+	printf '%s' "${SRVANY_NG_TARBALL_CHECKSUM:?}  /tmp/srvany-ng.tgz" | sha256sum -c
+	mkdir /tmp/srvany-ng/ && tar -xzf /tmp/srvany-ng.tgz --strip-components=1 -C /tmp/srvany-ng/
+	make -C /tmp/srvany-ng/ build
+EOF
 
 # Download ncat
 ARG NCAT_ZIP_URL=https://nmap.org/dist/ncat-portable-5.59BETA1.zip
 ARG NCAT_ZIP_CHECKSUM=9cdc2e688410f4563af7002d8dfa3f8a5710f15f6d409be2cab4e87890c91d1c
-RUN curl -Lo /tmp/ncat.zip "${NCAT_ZIP_URL:?}"
-RUN printf '%s' "${NCAT_ZIP_CHECKSUM:?}  /tmp/ncat.zip" | sha256sum -c
-RUN 7z e /tmp/ncat.zip -so '**/*.exe' > /tmp/ncat.exe
+RUN <<-EOF
+	curl -Lo /tmp/ncat.zip "${NCAT_ZIP_URL:?}"
+	printf '%s' "${NCAT_ZIP_CHECKSUM:?}  /tmp/ncat.zip" | sha256sum -c
+	7z e /tmp/ncat.zip -so '**/*.exe' > /tmp/ncat.exe
+EOF
 
 # Download Samba
 ARG SAMBA_EXE_URL=https://svn.reactos.org/packages/samba-for-ReactOSv1.3.exe
 ARG SAMBA_EXE_CHECKSUM=c3f55cd7a4069cd682cbdca3954c425f6657e3a1aba786e3d1559448e9f849a3
-RUN curl -Lo /tmp/samba.exe "${SAMBA_EXE_URL:?}"
-RUN printf '%s' "${SAMBA_EXE_CHECKSUM:?}  /tmp/samba.exe" | sha256sum -c
+RUN <<-EOF
+	curl -Lo /tmp/samba.exe "${SAMBA_EXE_URL:?}"
+	printf '%s' "${SAMBA_EXE_CHECKSUM:?}  /tmp/samba.exe" | sha256sum -c
+EOF
 
 # Download BusyBox
 ARG BUSYBOX_EXE_URL=https://frippery.org/files/busybox/busybox-w32-FRP-5579-g5749feb35.exe
 ARG BUSYBOX_EXE_CHECKSUM=497607849a3e581615e46292d9063313d9a27a54380aad60ba2c5328838e3bb6
-RUN curl -Lo /tmp/busybox.exe "${BUSYBOX_EXE_URL:?}"
-RUN printf '%s' "${BUSYBOX_EXE_CHECKSUM:?}  /tmp/busybox.exe" | sha256sum -c
+RUN <<-EOF
+	curl -Lo /tmp/busybox.exe "${BUSYBOX_EXE_URL:?}"
+	printf '%s' "${BUSYBOX_EXE_CHECKSUM:?}  /tmp/busybox.exe" | sha256sum -c
+EOF
 
 # Download and install ReactOS
 ARG REACTOS_ISO_URL=https://downloads.sourceforge.net/reactos/ReactOS-0.4.15-release-1-gdbb43bbaeb2-x86-iso.zip
 ARG REACTOS_ISO_CHECKSUM=2be97d87fd43c93185aa841c1742fe9265c58aba0e517e20122df19d9add1935
-RUN curl -Lo /tmp/reactos.zip "${REACTOS_ISO_URL:?}"
-RUN printf '%s' "${REACTOS_ISO_CHECKSUM:?}  /tmp/reactos.zip" | sha256sum -c
-RUN 7z e /tmp/reactos.zip -so '*.iso' > /tmp/reactos.iso \
-	&& 7z x /tmp/reactos.iso -o/tmp/reactos/ \
-	&& rm -f /tmp/reactos.iso
+RUN <<-EOF
+	curl -Lo /tmp/reactos.zip "${REACTOS_ISO_URL:?}"
+	printf '%s' "${REACTOS_ISO_CHECKSUM:?}  /tmp/reactos.zip" | sha256sum -c
+	7z e /tmp/reactos.zip -so '*.iso' > /tmp/reactos.iso
+	7z x /tmp/reactos.iso -o/tmp/reactos/
+	rm -f /tmp/reactos.zip /tmp/reactos.iso
+EOF
 COPY --chown=root:root ./data/iso/ /tmp/reactos/
-RUN install -D /tmp/srvany-ng/srvany-ng.exe /tmp/reactos/reactos/3rdParty/srvany-ng.exe
-RUN install -D /tmp/ncat.exe /tmp/reactos/reactos/3rdParty/ncat.exe
-RUN install -D /tmp/samba.exe /tmp/reactos/reactos/3rdParty/samba.exe
-RUN install -D /tmp/busybox.exe /tmp/reactos/reactos/3rdParty/busybox.exe
-RUN mkisofs -no-emul-boot -iso-level 4 -eltorito-boot loader/isoboot.bin -o /tmp/reactos.iso /tmp/reactos/ \
-	&& qemu-img create -f qcow2 /tmp/reactos.qcow2 128G \
-	&& timeout 900 qemu-system-x86_64 \
+RUN <<-EOF
+	install -D /tmp/srvany-ng/srvany-ng.exe /tmp/reactos/reactos/3rdParty/srvany-ng.exe
+	install -D /tmp/ncat.exe /tmp/reactos/reactos/3rdParty/ncat.exe
+	install -D /tmp/samba.exe /tmp/reactos/reactos/3rdParty/samba.exe
+	install -D /tmp/busybox.exe /tmp/reactos/reactos/3rdParty/busybox.exe
+EOF
+RUN <<-EOF
+	mkisofs -no-emul-boot -iso-level 4 -eltorito-boot loader/isoboot.bin -o /tmp/reactos.iso /tmp/reactos/
+	qemu-img create -f qcow2 /tmp/reactos.qcow2 128G
+	timeout 900 qemu-system-x86_64 \
 		-machine pc -smp 2 -m 512M -accel tcg \
 		-device VGA -display none -serial stdio \
 		-device e1000,netdev=n0 -netdev user,id=n0,ipv4=on,ipv6=off,net=10.0.2.0/24,host=10.0.2.2,dns=10.0.2.3,dhcpstart=10.0.2.15,restrict=on \
@@ -87,6 +110,7 @@ RUN mkisofs -no-emul-boot -iso-level 4 -eltorito-boot loader/isoboot.bin -o /tmp
 		-device ide-cd,id=cd0,bus=ide.1,drive=cd0 -blockdev driver=raw,node-name=cd0,file.driver=file,file.filename=/tmp/reactos.iso,read-only=on \
 		-boot order=cd,menu=off \
 		-usb -device usb-tablet
+EOF
 
 ##################################################
 ## "base" stage
@@ -94,10 +118,13 @@ RUN mkisofs -no-emul-boot -iso-level 4 -eltorito-boot loader/isoboot.bin -o /tmp
 
 m4_ifdef([[CROSS_ARCH]], [[FROM docker.io/CROSS_ARCH/ubuntu:24.04]], [[FROM docker.io/ubuntu:24.04]]) AS base
 
+SHELL ["/bin/sh", "-euc"]
+
 # Install system packages
-RUN export DEBIAN_FRONTEND=noninteractive \
-	&& apt-get update \
-	&& apt-get install -y --no-install-recommends \
+RUN <<-EOF
+	export DEBIAN_FRONTEND=noninteractive
+	apt-get update
+	apt-get install -y --no-install-recommends \
 		catatonit \
 		net-tools \
 		netcat-openbsd \
@@ -107,8 +134,9 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 		qemu-utils \
 		rlwrap \
 		runit \
-		samba \
-	&& rm -rf /var/lib/apt/lists/*
+		samba
+	rm -rf /var/lib/apt/lists/*
+EOF
 
 # Environment
 ENV VM_CPU=2
@@ -128,19 +156,13 @@ COPY --from=build --chown=root:root /tmp/websockify/ /opt/novnc/utils/websockify
 COPY --from=build --chown=root:root /tmp/reactos.qcow2 /var/lib/qemu/disk/reactos.qcow2
 
 # Copy Samba config
-COPY --chown=root:root ./config/samba/ /etc/samba/
-RUN find /etc/samba/ -type d -not -perm 0755 -exec chmod 0755 '{}' ';'
-RUN find /etc/samba/ -type f -not -perm 0644 -exec chmod 0644 '{}' ';'
+COPY --chown=root:root --chmod=a+rX,u+w,go-w ./config/samba/ /etc/samba/
 
 # Copy services
-COPY --chown=root:root ./scripts/service/ /etc/service/
-RUN find /etc/service/ -type d -not -perm 0755 -exec chmod 0755 '{}' ';'
-RUN find /etc/service/ -type f -not -perm 0755 -exec chmod 0755 '{}' ';'
+COPY --chown=root:root --chmod=0755 ./scripts/service/ /etc/service/
 
 # Copy bin scripts
-COPY --chown=root:root ./scripts/bin/ /usr/local/bin/
-RUN find /usr/local/bin/ -type d -not -perm 0755 -exec chmod 0755 '{}' ';'
-RUN find /usr/local/bin/ -type f -not -perm 0755 -exec chmod 0755 '{}' ';'
+COPY --chown=root:root --chmod=0755 ./scripts/bin/ /usr/local/bin/
 
 ENTRYPOINT ["/usr/bin/catatonit", "--", "/usr/local/bin/container-init"]
 
@@ -150,13 +172,15 @@ ENTRYPOINT ["/usr/bin/catatonit", "--", "/usr/local/bin/container-init"]
 
 FROM base AS test
 
-RUN if [ "$(uname -m)" = 'x86_64' ]; then \
-		container-init & \
-		printf '%s\n' 'The quick brown fox jumps over the lazy dog' > /mnt/in || exit 1; \
-		printf '%s\n' '@echo off & smbclient -c "get /in C:/local; quit" //10.0.2.2/share noop & exit' | timeout 900 vmshell || exit 1; \
-		printf '%s\n' '@echo off & smbclient -c "put C:/local /out; quit" //10.0.2.2/share noop & exit' | timeout 120 vmshell || exit 1; \
-		cmp -s /mnt/in /mnt/out || exit 1; \
+RUN <<-EOF
+	if [ "$(uname -m)" = 'x86_64' ]; then
+		container-init &
+		printf '%s\n' 'The quick brown fox jumps over the lazy dog' > /mnt/in || exit 1
+		printf '%s\n' '@echo off & smbclient -c "get /in C:/local; quit" //10.0.2.2/share noop & exit' | timeout 900 vmshell || exit 1
+		printf '%s\n' '@echo off & smbclient -c "put C:/local /out; quit" //10.0.2.2/share noop & exit' | timeout 120 vmshell || exit 1
+		cmp -s /mnt/in /mnt/out || exit 1
 	fi
+EOF
 
 ##################################################
 ## "main" stage
